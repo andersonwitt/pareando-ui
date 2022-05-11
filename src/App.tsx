@@ -7,25 +7,34 @@ import {
   Tooltip,
 } from "@mui/material";
 import RemoveCircleOutlineOutlinedIcon from "@mui/icons-material/RemoveCircleOutlineOutlined";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AppBar } from "./components/atoms/AppBar";
 
-function compareArrays(a1: any[], a2: any[]) {
-  return a1.length === a2.length && a1.every((value) => a2.includes(value));
-}
+const worker: Worker = new Worker("./workers/worker.js");
 
 function App() {
   const [name, setName] = useState("");
-  // const [items, setItems] = useState<string[]>([
-  //   "Anderson",
-  //   "Carlos",
-  //   "Fabian",
-  //   "João",
-  //   "Jordan",
-  //   "Giovany",
-  //   "Leandro",
-  // ]);
-  const [items, setItems] = useState<string[]>([]);
+  const [items, setItems] = useState<string[]>([
+    "anderson",
+    "carlos",
+    "jordan",
+    "alin",
+    "ana",
+    "fabian",
+    "vinicius",
+    "giovany",
+    "joao",
+    "leandro",
+  ]);
+
+  useEffect(() => {
+    worker.onmessage = (event: MessageEvent) => {
+      const { data } = event;
+      setTeams(data);
+    };
+  }, []);
+
+  //const [items, setItems] = useState<string[]>([]);
 
   const [teams, setTeams] = useState<string[][][]>([]);
 
@@ -40,84 +49,9 @@ function App() {
     setItems(newItems);
   };
 
-  const createGroupShuffled = () => {
-    debugger;
-    const rounds: string[][][] = [];
-    while (rounds.length < items.length) {
-      let groups: string[][] = [];
-      let array = [...items];
-      while (array.length > 0) {
-        const pair: string[] = [];
-        let second = [...array];
-        pair.push(
-          second.splice(Math.floor(Math.random() * second.length), 1)[0]
-        );
-
-        if (second.length > 1) {
-          pair.push(
-            second.splice(Math.floor(Math.random() * second.length), 1)[0]
-          );
-        }
-        const thereIsSomeItemEqual = rounds
-          .flat()
-          .some((item) => compareArrays(item, pair));
-
-        if (!thereIsSomeItemEqual) {
-          groups.push(pair);
-          array = [...second];
-          continue;
-        }
-
-        groups = [];
-        array = [...items];
-      }
-      if (array.length === 0) {
-        rounds.push(groups);
-      }
-    }
-    setTeams(rounds);
+  const handleClickGenerateGroups = () => {
+    worker.postMessage(items);
   };
-
-  // const createGroupShuffled = () => {
-  //   debugger;
-  //   //const rounds: string[][][] = [];
-  //   //while (rounds.length < items.length) {
-  //   const nPairs = items.length % 2 === 0 ? items.length : items.length + 1;
-  //   const seila = (nPairs / 2) * items.length;
-  //   let groups: string[][] = [];
-  //   let array = [...items];
-  //   while (groups.length < seila) {
-  //     const pair: string[] = [];
-  //     let second = [...array];
-  //     pair.push(second.splice(Math.floor(Math.random() * second.length), 1)[0]);
-
-  //     if (second.length > 0) {
-  //       pair.push(
-  //         second.splice(Math.floor(Math.random() * second.length), 1)[0]
-  //       );
-  //     }
-  //     const thereIsSomeItemEqual = groups.some((item) =>
-  //       compareArrays(item, pair)
-  //     );
-
-  //     //const isEmpty = pair.filter((item) => item).length <= 0;
-
-  //     if (!thereIsSomeItemEqual) {
-  //       groups.push(pair);
-  //       array = [...second];
-  //       continue;
-  //     }
-
-  //     //groups = [];
-  //     array = [...items];
-  //   }
-  //   console.log(groups);
-  //   // if (array.length === 0) {
-  //   //   rounds.push(groups);
-  //   // }
-  //   //}
-  //   //setTeams(rounds);
-  // };
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -177,7 +111,7 @@ function App() {
             <Button
               variant="contained"
               color="primary"
-              onClick={createGroupShuffled}
+              onClick={handleClickGenerateGroups}
               fullWidth
             >
               Gerar Grupos
