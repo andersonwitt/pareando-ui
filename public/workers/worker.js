@@ -3,32 +3,60 @@ function compareArrays(a1, a2) {
 }
 
 const createGroupShuffled = (items = []) => {
-  let results = [];
+  const players = [
+    "Anderson",
+    "Leonardo",
+    "Douglas",
+    "Marcelli",
+    "Wesley",
+    "alguem",
+  ];
 
-  for (let i = 0; i < items.length - 1; i++) {
-    for (let j = i + 1; j < items.length; j++) {
-      results.push(items[i] + " " + items[j]);
+  // Função para embaralhar um array
+  function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
     }
+    return array;
   }
 
-  results = results
-    .sort(() => Math.random() - 0.5)
-    .map((item) => item.split(" "));
+  const shuffledPlayers = shuffleArray(players);
+  const rounds = [];
 
-  const n = items.length;
-  const result = [...new Array(items.length)].map(() => []);
+  const playersPerTeam = 3; // Defina o número de jogadores em cada time
 
-  const wordsPerLine = Math.ceil(results.length / items.length);
-
-  for (let line = 0; line < n; line++) {
-    for (let i = 0; i < wordsPerLine; i++) {
-      const value = results[i + line * wordsPerLine];
-      if (!value) continue;
-      result[line].push(value);
-    }
+  if (shuffledPlayers.length % playersPerTeam !== 0) {
+    shuffledPlayers.push("alone");
   }
 
-  return result.filter(array => array?.length);
+  const totalPlayers = shuffledPlayers.length;
+  const totalRounds = totalPlayers - 1;
+
+  for (let round = 0; round < totalRounds; round++) {
+    const roundMatches = [];
+    const usedPlayers = new Set();
+
+    for (let i = 0; i < totalPlayers / playersPerTeam; i++) {
+      const team = [];
+
+      for (let j = 0; j < playersPerTeam; j++) {
+        let playerIndex;
+        do {
+          playerIndex = Math.floor(Math.random() * totalPlayers);
+        } while (usedPlayers.has(playerIndex));
+        usedPlayers.add(playerIndex);
+
+        team.push(shuffledPlayers[playerIndex]);
+      }
+
+      roundMatches.push(team);
+    }
+
+    rounds.push(roundMatches);
+  }
+
+  return rounds;
 };
 
 self.onmessage = (e) => {
