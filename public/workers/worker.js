@@ -2,16 +2,7 @@ function compareArrays(a1, a2) {
   return a1.length === a2.length && a1.every((value) => a2.includes(value));
 }
 
-const createGroupShuffled = (items = []) => {
-  const players = [
-    "Anderson",
-    "Leonardo",
-    "Douglas",
-    "Marcelli",
-    "Wesley",
-    "alguem",
-  ];
-
+const createGroupShuffled = (players = []) => {
   // Função para embaralhar um array
   function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -24,7 +15,7 @@ const createGroupShuffled = (items = []) => {
   const shuffledPlayers = shuffleArray(players);
   const rounds = [];
 
-  const playersPerTeam = 3; // Defina o número de jogadores em cada time
+  const playersPerTeam = 2; // Defina o número de jogadores em cada time
 
   if (shuffledPlayers.length % playersPerTeam !== 0) {
     shuffledPlayers.push("alone");
